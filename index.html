@@ -63,7 +63,7 @@ button.success{background:#e8f7ef;color:var(--green)}
 button.small{padding:8px 12px;font-size:13px}
 button:disabled{opacity:.5;cursor:not-allowed}
 .full{width:100%;margin-top:16px;padding:13px}
-.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.statrow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .stat{background:#f7f8fc;border:1px solid var(--line);padding:14px;border-radius:13px}
 .stat b{font-size:25px;display:block;margin-top:5px}
 .queue{
@@ -198,6 +198,7 @@ footer{text-align:center;color:#8992a3;padding:30px 10px;font-size:12px}
   <div class="statrow">
    <div class="stat"><span class="muted">คิวทั้งหมดวันนี้</span><b id="totalCount">0</b></div>
    <div class="stat"><span class="muted">กำลังรอ</span><b id="waitingCount">0</b></div>
+   <div class="stat"><span class="muted">กำลังให้บริการ</span><b id="servingCount">0</b></div>
    <div class="stat"><span class="muted">เสร็จแล้ว</span><b id="doneCount">0</b></div>
   </div>
 
@@ -461,9 +462,11 @@ document.getElementById('bookBtn').addEventListener('click',()=>{
  const arr=getBookings();
  const today=new Date().toLocaleDateString('th-TH');
 
- const count=arr.filter(item=>
-  item.shop===shop&&item.day===today
- ).length+1;
+ const todays=arr.filter(item=>item.shop===shop&&item.day===today);
+ const count=todays.reduce((max,item)=>{
+  const n=Number(String(item.number||'').replace(/^Q/i,''));
+  return Number.isFinite(n)?Math.max(max,n):max;
+ },0)+1;
 
  const item={
   id:Date.now(),
@@ -480,10 +483,22 @@ document.getElementById('bookBtn').addEventListener('click',()=>{
 
  if(!saveBookings(arr))return;
 
- document.getElementById('bookingResult').innerHTML=
-  '<div class="successbox"><strong>จองคิวสำเร็จ (ตัวอย่าง)</strong><br>'+
-  'หมายเลขคิว <b style="font-size:25px">'+item.number+'</b><br>'+
-  'ร้าน: '+item.shop+'<br>บริการ: '+item.service+'</div>';
+ const result=document.getElementById('bookingResult');
+ result.innerHTML='';
+ const box=document.createElement('div');
+ box.className='successbox';
+ const heading=document.createElement('strong');
+ heading.textContent='จองคิวสำเร็จ';
+ const number=document.createElement('div');
+ number.textContent='หมายเลขคิว '+item.number;
+ number.style.fontSize='25px';
+ number.style.fontWeight='800';
+ const shopLine=document.createElement('div');
+ shopLine.textContent='ร้าน: '+item.shop;
+ const serviceLine=document.createElement('div');
+ serviceLine.textContent='บริการ: '+item.service;
+ box.append(heading,number,shopLine,serviceLine);
+ result.append(box);
 
  document.getElementById('customerName').value='';
  document.getElementById('customerPhone').value='';
@@ -498,9 +513,11 @@ function renderOwner(){
 
  const done=all.filter(item=>item.status==='เสร็จแล้ว').length;
  const waiting=all.filter(item=>item.status==='รอเรียกคิว').length;
+ const serving=all.filter(item=>item.status==='กำลังให้บริการ').length;
 
  document.getElementById('totalCount').textContent=all.length;
  document.getElementById('waitingCount').textContent=waiting;
+ document.getElementById('servingCount').textContent=serving;
  document.getElementById('doneCount').textContent=done;
 
  const list=document.getElementById('queueList');
@@ -532,22 +549,22 @@ function renderOwner(){
   num.textContent=item.number;
 
   const status=document.createElement('span');
-  status.className='tag '+(item.status==='เสร็จแล้ว'?'done':'');
+  status.className='tag '+(item.status==='เสร็จแล้ว'?'done':item.status==='กำลังให้บริการ'?'status-open':'');
   status.textContent=item.status;
 
   const actions=document.createElement('div');
 
   if(item.status!=='เสร็จแล้ว'){
    const button=document.createElement('button');
-   button.className='small success';
-   button.textContent='เสร็จแล้ว';
+   button.className='small '+(item.status==='กำลังให้บริการ'?'success':'primary');
+   button.textContent=item.status==='กำลังให้บริการ'?'ทำเครื่องหมายว่าเสร็จ':'เรียกคิวนี้';
 
    button.addEventListener('click',()=>{
     const bookings=getBookings();
     const target=bookings.find(x=>x.id===item.id);
 
     if(target){
-     target.status='เสร็จแล้ว';
+     target.status=target.status==='กำลังให้บริการ'?'เสร็จแล้ว':'กำลังให้บริการ';
      if(saveBookings(bookings))renderOwner();
     }
    });
