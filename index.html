@@ -1,87 +1,450 @@
+
 <!doctype html>
 <html lang="th">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>QQueue — ระบบจองคิวออนไลน์</title>
 <style>
 :root{--ink:#172033;--muted:#667085;--line:#e7eaf0;--bg:#f5f7fb;--blue:#315efb;--blue2:#2448d8;--green:#16865b;--red:#d9485f;--card:#fff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Tahoma,"Noto Sans Thai",sans-serif;color:var(--ink)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:Tahoma,"Noto Sans Thai",sans-serif;color:var(--ink)}
 header{background:#fff;border-bottom:1px solid var(--line);padding:14px 22px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:3}
-.brand{font-size:23px;font-weight:800;color:var(--blue);letter-spacing:-.5px}.brand span{color:#1b2540}
-nav{display:flex;gap:7px;flex-wrap:wrap}.navbtn,button{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:14px}.navbtn{background:#f0f3fa;color:#344054}.navbtn.active,button.primary{background:var(--blue);color:#fff}.navbtn:hover,button.primary:hover{background:var(--blue2);color:#fff}
-main{max-width:1100px;margin:26px auto;padding:0 18px}.hero{background:linear-gradient(120deg,#183dbb,#4777ff);color:white;border-radius:22px;padding:28px;display:flex;justify-content:space-between;gap:20px;align-items:center}.hero h1{font-size:clamp(25px,4vw,36px);margin:0 0 8px}.hero p{margin:0;color:#e6ecff;line-height:1.7}.hero .pill{background:#ffffff20;border:1px solid #ffffff50;padding:8px 12px;border-radius:30px;white-space:nowrap}
-.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 5px 20px #1b2c5010}.card h2{font-size:20px;margin:0 0 16px}.muted{color:var(--muted);font-size:13px;line-height:1.6}
-label{display:block;font-weight:700;font-size:14px;margin:13px 0 7px}input,select{width:100%;padding:12px;border:1px solid #d7dce5;border-radius:10px;font:inherit;background:#fff}input:focus,select:focus{outline:2px solid #cbd7ff;border-color:var(--blue)}
-button{background:#eef2ff;color:#2947b8}button.danger{background:#fff0f1;color:var(--red)}button.success{background:#e8f7ef;color:var(--green)}button.small{padding:7px 10px;font-size:12px}
-.full{width:100%;margin-top:16px;padding:13px}.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#f7f8fc;border:1px solid var(--line);padding:14px;border-radius:13px}.stat b{font-size:25px;display:block;margin-top:5px}.queue{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}.queue:last-child{border:0}.qno{font-size:22px;font-weight:800;color:var(--blue);min-width:58px}.qmeta{flex:1}.qmeta strong{display:block}.tag{display:inline-block;border-radius:30px;padding:4px 8px;font-size:11px;background:#fff4db;color:#966000}.tag.done{background:#e8f7ef;color:#16865b}.tag.cancel{background:#fff0f1;color:#c23b50}.hidden{display:none!important}.notice{padding:12px 14px;border-radius:12px;background:#eff4ff;color:#2947b8;font-size:13px;line-height:1.6;margin-top:12px}.successbox{background:#eaf8f0;color:#176b48;padding:14px;border-radius:12px;margin-top:14px}.shopcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.shop{border:1px solid var(--line);padding:16px;border-radius:14px;background:#fff}.shop h3{margin:0 0 7px}.shop button{margin-top:12px;width:100%}.tablehead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.brand{font-size:23px;font-weight:800;color:var(--blue);letter-spacing:-.5px}
+.brand span{color:#1b2540}
+nav{display:flex;gap:7px;flex-wrap:wrap}
+.navbtn,button{border:0;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:14px}
+.navbtn{background:#f0f3fa;color:#344054}
+.navbtn.active,button.primary{background:var(--blue);color:#fff}
+.navbtn:hover,button.primary:hover{background:var(--blue2);color:#fff}
+main{max-width:1100px;margin:26px auto;padding:0 18px}
+.hero{background:linear-gradient(120deg,#183dbb,#4777ff);color:white;border-radius:22px;padding:28px;display:flex;justify-content:space-between;gap:20px;align-items:center}
+.hero h1{font-size:clamp(25px,4vw,36px);margin:0 0 8px}
+.hero p{margin:0;color:#e6ecff;line-height:1.7}
+.hero .pill{background:#ffffff20;border:1px solid #ffffff50;padding:8px 12px;border-radius:30px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px;margin-top:18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 5px 20px #1b2c5010}
+.card h2{font-size:20px;margin:0 0 16px}
+.muted{color:var(--muted);font-size:13px;line-height:1.6}
+label{display:block;font-weight:700;font-size:14px;margin:13px 0 7px}
+input,select{width:100%;padding:12px;border:1px solid #d7dce5;border-radius:10px;font:inherit;background:#fff}
+input:focus,select:focus{outline:2px solid #cbd7ff;border-color:var(--blue)}
+button{background:#eef2ff;color:#2947b8}
+button.danger{background:#fff0f1;color:var(--red)}
+button.success{background:#e8f7ef;color:var(--green)}
+button.small{padding:7px 10px;font-size:12px}
+button:disabled{opacity:.5;cursor:not-allowed}
+.full{width:100%;margin-top:16px;padding:13px}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stat{background:#f7f8fc;border:1px solid var(--line);padding:14px;border-radius:13px}
+.stat b{font-size:25px;display:block;margin-top:5px}
+.queue{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}
+.queue:last-child{border:0}
+.qno{font-size:22px;font-weight:800;color:var(--blue);min-width:58px}
+.qmeta{flex:1}
+.qmeta strong{display:block}
+.tag{display:inline-block;border-radius:30px;padding:4px 8px;font-size:11px;background:#fff4db;color:#966000}
+.tag.done{background:#e8f7ef;color:#16865b}
+.tag.cancel{background:#fff0f1;color:#c23b50}
+.hidden{display:none!important}
+.notice{padding:12px 14px;border-radius:12px;background:#eff4ff;color:#2947b8;font-size:13px;line-height:1.6;margin-top:12px}
+.successbox{background:#eaf8f0;color:#176b48;padding:14px;border-radius:12px;margin-top:14px}
+.shopcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.shop{border:1px solid var(--line);padding:16px;border-radius:14px;background:#fff}
+.shop h3{margin:0 0 7px}
+.shop button{margin-top:12px;width:100%}
+.tablehead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.admin-actions{display:flex;align-items:center;gap:8px}
+.status-open{color:var(--green);background:#e8f7ef}
+.status-closed{color:var(--red);background:#fff0f1}
 footer{text-align:center;color:#8992a3;padding:30px 10px;font-size:12px}
-@media(max-width:760px){header{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.shopcards{grid-template-columns:1fr}.hero{align-items:flex-start;flex-direction:column}.statrow{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){
+ header{align-items:flex-start;flex-direction:column}
+ .grid{grid-template-columns:1fr}
+ .shopcards{grid-template-columns:1fr}
+ .hero{align-items:flex-start;flex-direction:column}
+ .statrow{grid-template-columns:1fr 1fr}
+ .queue{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
-<header><div class="brand">QQueue<span> .</span></div><nav>
-<button class="navbtn active" data-view="customer">หน้าลูกค้า</button>
-<button class="navbtn" data-view="owner">หน้าร้านค้า</button>
-<button class="navbtn" data-view="admin">ผู้ดูแลระบบ</button>
-</nav></header>
+
+<header>
+ <div class="brand">QQueue<span> .</span></div>
+ <nav>
+  <button class="navbtn active" data-view="customer">หน้าลูกค้า</button>
+  <button class="navbtn" data-view="owner">หน้าร้านค้า</button>
+  <button class="navbtn" data-view="admin">ผู้ดูแลระบบ</button>
+ </nav>
+</header>
+
 <main>
-<section class="hero"><div><h1>จองคิวง่าย ไม่ต้องรอนาน</h1><p>ระบบจองคิวออนไลน์สำหรับร้านค้าและธุรกิจบริการ<br>เลือกบริการ จองคิว และติดตามสถานะได้ในหน้าเดียว</p></div><div class="pill">ตัวอย่างระบบ QQueue</div></section>
+<section class="hero">
+ <div>
+  <h1>จองคิวง่าย ไม่ต้องรอนาน</h1>
+  <p>ระบบจองคิวออนไลน์สำหรับร้านค้าและธุรกิจบริการ<br>เลือกบริการ จองคิว และติดตามสถานะได้ในหน้าเดียว</p>
+ </div>
+ <div class="pill">ตัวอย่างระบบ QQueue</div>
+</section>
 
 <section id="customer" class="view">
-<div class="grid">
-<div class="card"><h2>จองคิวของคุณ</h2><p class="muted">เลือกสาขาและบริการ จากนั้นกรอกข้อมูลเพื่อรับหมายเลขคิว</p>
-<label>เลือกร้านค้า</label><select id="shopSelect"><option value="ร้านตัวอย่าง QQueue">ร้านตัวอย่าง QQueue</option><option value="คลินิกสุขใจ">คลินิกสุขใจ</option><option value="ร้านเสริมสวยมีนา">ร้านเสริมสวยมีนา</option></select>
-<label>ชื่อของคุณ</label><input id="customerName" placeholder="เช่น สมชาย ใจดี">
-<label>เบอร์โทรศัพท์</label><input id="customerPhone" placeholder="เช่น 020 1234 5678">
-<label>เลือกบริการ</label><select id="service"><option>บริการทั่วไป</option><option>ปรึกษา / สอบถาม</option><option>ติดต่อเจ้าหน้าที่</option></select>
-<button class="primary full" id="bookBtn">ยืนยันการจองคิว</button><div id="bookingResult"></div></div>
-<div class="card"><h2>ร้านค้าที่ใช้ QQueue</h2><p class="muted">ตัวอย่างหน้าร้านหลายประเภทธุรกิจ</p><div class="shopcards">
-<div class="shop"><h3>ร้านตัวอย่าง QQueue</h3><div class="muted">บริการทั่วไป · 09:00–17:00</div><button class="small" onclick="chooseShop('ร้านตัวอย่าง QQueue')">จองร้านนี้</button></div>
-<div class="shop"><h3>คลินิกสุขใจ</h3><div class="muted">ปรึกษา · 08:30–16:30</div><button class="small" onclick="chooseShop('คลินิกสุขใจ')">จองร้านนี้</button></div>
-<div class="shop"><h3>ร้านเสริมสวยมีนา</h3><div class="muted">เสริมสวย · 10:00–19:00</div><button class="small" onclick="chooseShop('ร้านเสริมสวยมีนา')">จองร้านนี้</button></div>
-</div><div class="notice">หมายเหตุ: ตอนนี้เป็นเดโมสำหรับทดลองหน้าจอ ข้อมูลบันทึกไว้ในเบราว์เซอร์เครื่องนี้ ยังไม่เชื่อมฐานข้อมูลออนไลน์</div></div>
-</div></section>
+ <div class="grid">
+  <div class="card">
+   <h2>จองคิวของคุณ</h2>
+   <p class="muted">เลือกสาขาและบริการ จากนั้นกรอกข้อมูลเพื่อรับหมายเลขคิว</p>
+
+   <label>เลือกร้านค้า</label>
+   <select id="shopSelect">
+    <option value="ร้านตัวอย่าง QQueue">ร้านตัวอย่าง QQueue</option>
+    <option value="คลินิกสุขใจ">คลินิกสุขใจ</option>
+    <option value="ร้านเสริมสวยมีนา">ร้านเสริมสวยมีนา</option>
+   </select>
+
+   <label>ชื่อของคุณ</label>
+   <input id="customerName" placeholder="เช่น สมชาย ใจดี">
+
+   <label>เบอร์โทรศัพท์</label>
+   <input id="customerPhone" placeholder="เช่น 020 1234 5678">
+
+   <label>เลือกบริการ</label>
+   <select id="service">
+    <option>บริการทั่วไป</option>
+    <option>ปรึกษา / สอบถาม</option>
+    <option>ติดต่อเจ้าหน้าที่</option>
+   </select>
+
+   <button class="primary full" id="bookBtn">ยืนยันการจองคิว</button>
+   <div id="bookingResult"></div>
+  </div>
+
+  <div class="card">
+   <h2>ร้านค้าที่ใช้ QQueue</h2>
+   <p class="muted">ตัวอย่างหน้าร้านหลายประเภทธุรกิจ</p>
+   <div class="shopcards">
+    <div class="shop">
+     <h3>ร้านตัวอย่าง QQueue</h3>
+     <div class="muted">บริการทั่วไป · 09:00–17:00</div>
+     <button class="small" onclick="chooseShop('ร้านตัวอย่าง QQueue')">จองร้านนี้</button>
+    </div>
+    <div class="shop">
+     <h3>คลินิกสุขใจ</h3>
+     <div class="muted">ปรึกษา · 08:30–16:30</div>
+     <button class="small" onclick="chooseShop('คลินิกสุขใจ')">จองร้านนี้</button>
+    </div>
+    <div class="shop">
+     <h3>ร้านเสริมสวยมีนา</h3>
+     <div class="muted">เสริมสวย · 10:00–19:00</div>
+     <button class="small" onclick="chooseShop('ร้านเสริมสวยมีนา')">จองร้านนี้</button>
+    </div>
+   </div>
+   <div class="notice" id="shopNotice">สถานะร้านค้าแสดงตามการตั้งค่าของผู้ดูแลระบบ</div>
+  </div>
+ </div>
+</section>
 
 <section id="owner" class="view hidden">
-<div class="card"><div class="tablehead"><div><h2>แดชบอร์ดเจ้าของร้าน</h2><p class="muted">ตัวอย่างหน้าจัดการคิวของร้านค้า</p></div><select id="ownerShop" style="max-width:230px"><option>ร้านตัวอย่าง QQueue</option><option>คลินิกสุขใจ</option><option>ร้านเสริมสวยมีนา</option></select></div>
-<div class="statrow"><div class="stat"><span class="muted">คิวทั้งหมดวันนี้</span><b id="totalCount">0</b></div><div class="stat"><span class="muted">กำลังรอ</span><b id="waitingCount">0</b></div><div class="stat"><span class="muted">เสร็จแล้ว</span><b id="doneCount">0</b></div></div>
-<h2 style="margin-top:24px">รายการคิววันนี้</h2><div id="queueList"></div><div class="notice">เดโมนี้ยังไม่มีระบบล็อกอินจริง และยังไม่แยกสิทธิ์เจ้าของร้าน ข้อมูลทั้งหมดอยู่ในเบราว์เซอร์นี้เท่านั้น</div></div>
+ <div class="card">
+  <div class="tablehead">
+   <div>
+    <h2>แดชบอร์ดเจ้าของร้าน</h2>
+    <p class="muted">ตัวอย่างหน้าจัดการคิวของร้านค้า</p>
+   </div>
+   <select id="ownerShop" style="max-width:230px">
+    <option>ร้านตัวอย่าง QQueue</option>
+    <option>คลินิกสุขใจ</option>
+    <option>ร้านเสริมสวยมีนา</option>
+   </select>
+  </div>
+
+  <div class="statrow">
+   <div class="stat"><span class="muted">คิวทั้งหมดวันนี้</span><b id="totalCount">0</b></div>
+   <div class="stat"><span class="muted">กำลังรอ</span><b id="waitingCount">0</b></div>
+   <div class="stat"><span class="muted">เสร็จแล้ว</span><b id="doneCount">0</b></div>
+  </div>
+
+  <h2 style="margin-top:24px">รายการคิววันนี้</h2>
+  <div id="queueList"></div>
+  <div class="notice">เดโมนี้ยังไม่มีระบบล็อกอินจริง และยังไม่แยกสิทธิ์เจ้าของร้าน ข้อมูลทั้งหมดอยู่ในเบราว์เซอร์นี้เท่านั้น</div>
+ </div>
 </section>
 
 <section id="admin" class="view hidden">
-<div class="card"><div class="tablehead"><div><h2>ผู้ดูแลระบบ QQueue</h2><p class="muted">ภาพตัวอย่างสำหรับผู้ดูแลแพลตฟอร์ม</p></div><span class="tag">SUPER ADMIN · DEMO</span></div>
-<div class="statrow"><div class="stat"><span class="muted">ร้านค้าทั้งหมด</span><b>3</b></div><div class="stat"><span class="muted">แพ็กเกจฟรี</span><b>3</b></div><div class="stat"><span class="muted">รายได้รายเดือน</span><b>0 ฿</b></div></div>
-<h2 style="margin-top:24px">จัดการร้านค้า</h2><div class="queue"><div class="qmeta"><strong>ร้านตัวอย่าง QQueue</strong><span class="muted">เจ้าของ: demo · แพ็กเกจทดลอง</span></div><span class="tag done">เปิดใช้งาน</span></div>
-<div class="queue"><div class="qmeta"><strong>คลินิกสุขใจ</strong><span class="muted">เจ้าของ: demo · แพ็กเกจฟรี</span></div><span class="tag done">เปิดใช้งาน</span></div>
-<div class="queue"><div class="qmeta"><strong>ร้านเสริมสวยมีนา</strong><span class="muted">เจ้าของ: demo · แพ็กเกจฟรี</span></div><button class="tag done" type="button" onclick="alert('ร้านเปิดใช้งานแล้ว')">เปิดใช้งาน</button></div>
-<div class="notice">หน้านี้เป็นภาพตัวอย่างเท่านั้น ยังไม่มีบัญชีผู้ดูแล ระบบชำระเงิน หรือข้อมูลร้านค้าจริง</div></div>
+ <div class="card">
+  <div class="tablehead">
+   <div>
+    <h2>ผู้ดูแลระบบ QQueue</h2>
+    <p class="muted">จัดการสถานะร้านค้าบนแพลตฟอร์ม</p>
+   </div>
+   <span class="tag">SUPER ADMIN · DEMO</span>
+  </div>
+
+  <div class="statrow">
+   <div class="stat"><span class="muted">ร้านค้าทั้งหมด</span><b id="adminTotal">3</b></div>
+   <div class="stat"><span class="muted">เปิดใช้งาน</span><b id="adminOpen">3</b></div>
+   <div class="stat"><span class="muted">ปิดใช้งาน</span><b id="adminClosed">0</b></div>
+  </div>
+
+  <h2 style="margin-top:24px">จัดการร้านค้า</h2>
+  <div id="adminShopList"></div>
+
+  <div class="notice">หมายเหตุ: หลังบ้านนี้เป็นเดโมสำหรับทดลอง ยังไม่มีระบบบัญชีผู้ดูแลหรือฐานข้อมูลออนไลน์</div>
+ </div>
 </section>
-</main><footer>QQueue © 2026 · ระบบจองคิวออนไลน์</footer>
+
+</main>
+<footer>QQueue © 2026 · ระบบจองคิวออนไลน์</footer>
+
 <script>
 const KEY='qqueue_demo_bookings_v1';
-const getBookings=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}};
+const SHOP_KEY='qqueue_demo_shop_status_v1';
+
+const shops=[
+ {name:'ร้านตัวอย่าง QQueue',owner:'demo',plan:'แพ็กเกจทดลอง'},
+ {name:'คลินิกสุขใจ',owner:'demo',plan:'แพ็กเกจฟรี'},
+ {name:'ร้านเสริมสวยมีนา',owner:'demo',plan:'แพ็กเกจฟรี'}
+];
+
+const getBookings=()=>{
+ try{return JSON.parse(localStorage.getItem(KEY)||'[]')}
+ catch(e){return []}
+};
+
 const saveBookings=x=>localStorage.setItem(KEY,JSON.stringify(x));
-function chooseShop(name){document.getElementById('shopSelect').value=name;showView('customer');document.getElementById('customerName').focus()}
-function showView(view){document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));document.getElementById(view).classList.remove('hidden');document.querySelectorAll('.navbtn').forEach(x=>x.classList.toggle('active',x.dataset.view===view));if(view==='owner')renderOwner()}
-document.querySelectorAll('.navbtn').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.view)));
-document.getElementById('bookBtn').addEventListener('click',()=>{
- const name=document.getElementById('customerName').value.trim(),phone=document.getElementById('customerPhone').value.trim();
- if(!name||!phone){alert('กรุณากรอกชื่อและเบอร์โทรศัพท์ก่อน');return}
- const shop=document.getElementById('shopSelect').value,arr=getBookings(),today=new Date().toLocaleDateString('th-TH');
- const count=arr.filter(x=>x.shop===shop&&x.day===today).length+1;
- const item={id:Date.now(),number:'Q'+String(count).padStart(3,'0'),name,phone,shop,service:document.getElementById('service').value,day:today,status:'รอเรียกคิว'};
- arr.push(item);saveBookings(arr);
- document.getElementById('bookingResult').innerHTML=`<div class="successbox"><strong>จองคิวสำเร็จ (ตัวอย่าง)</strong><br>หมายเลขคิว <b style="font-size:25px">${item.number}</b><br>ร้าน: ${shop}<br>บริการ: ${item.service}</div>`;
- document.getElementById('customerName').value='';document.getElementById('customerPhone').value='';renderOwner();
-});
-function renderOwner(){
- const shop=document.getElementById('ownerShop').value,all=getBookings().filter(x=>x.shop===shop),done=all.filter(x=>x.status==='เสร็จแล้ว').length,waiting=all.filter(x=>x.status==='รอเรียกคิว').length;
- document.getElementById('totalCount').textContent=all.length;document.getElementById('waitingCount').textContent=waiting;document.getElementById('doneCount').textContent=done;
- const list=document.getElementById('queueList');list.innerHTML='';
- if(!all.length){list.innerHTML='<p class="muted">ยังไม่มีคิว — ทดลองจองจากหน้าลูกค้า แล้วกลับมาดูที่นี่ได้เลย</p>';return}
- all.slice().reverse().forEach(x=>{const row=document.createElement('div');row.className='queue';const meta=document.createElement('div');meta.className='qmeta';const strong=document.createElement('strong');strong.textContent=x.name+' · '+x.service;const small=document.createElement('span');small.className='muted';small.textContent=x.phone+' · '+x.day;meta.append(strong,small);const num=document.createElement('div');num.className='qno';num.textContent=x.number;const status=document.createElement('span');status.className='tag '+(x.status==='เสร็จแล้ว'?'done':'');status.textContent=x.status;const actions=document.createElement('div');if(x.status!=='เสร็จแล้ว'){const btn=document.createElement('button');btn.className='small success';btn.textContent='เสร็จแล้ว';btn.onclick=()=>{const a=getBookings();const target=a.find(y=>y.id===x.id);if(target)target.status='เสร็จแล้ว';saveBookings(a);renderOwner()};actions.append(btn)}row.append(num,meta,status,actions);list.append(row)})
+
+function getShopStatuses(){
+ try{
+  const saved=JSON.parse(localStorage.getItem(SHOP_KEY)||'{}');
+  const result={};
+  shops.forEach(shop=>{
+   result[shop.name]=saved[shop.name]!==false;
+  });
+  return result;
+ }catch(e){
+  const result={};
+  shops.forEach(shop=>result[shop.name]=true);
+  return result;
+ }
 }
+
+function saveShopStatuses(statuses){
+ localStorage.setItem(SHOP_KEY,JSON.stringify(statuses));
+}
+
+function isShopOpen(name){
+ return getShopStatuses()[name]!==false;
+}
+
+function chooseShop(name){
+ if(!isShopOpen(name)){
+  alert('ร้านนี้ปิดให้บริการชั่วคราว กรุณาเลือกร้านอื่น');
+  return;
+ }
+ document.getElementById('shopSelect').value=name;
+ showView('customer');
+ document.getElementById('customerName').focus();
+}
+
+function showView(view){
+ document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));
+ document.getElementById(view).classList.remove('hidden');
+ document.querySelectorAll('.navbtn').forEach(x=>{
+  x.classList.toggle('active',x.dataset.view===view);
+ });
+ if(view==='owner')renderOwner();
+ if(view==='admin')renderAdmin();
+ if(view==='customer')renderCustomerShops();
+}
+
+document.querySelectorAll('.navbtn').forEach(b=>{
+ b.addEventListener('click',()=>showView(b.dataset.view));
+});
+
+function renderCustomerShops(){
+ const statuses=getShopStatuses();
+ document.querySelectorAll('.shop').forEach((card,index)=>{
+  const shop=shops[index];
+  if(!shop)return;
+  const button=card.querySelector('button');
+  const open=statuses[shop.name];
+  button.disabled=!open;
+  button.textContent=open?'จองร้านนี้':'ร้านปิดให้บริการ';
+  button.className=open?'small':'small danger';
+ });
+ const openCount=shops.filter(s=>statuses[s.name]).length;
+ document.getElementById('shopNotice').textContent=
+  'ขณะนี้มีร้านที่เปิดให้บริการ '+openCount+' จาก '+shops.length+' ร้าน';
+}
+
+function renderAdmin(){
+ const statuses=getShopStatuses();
+ const openCount=shops.filter(s=>statuses[s.name]).length;
+ const closedCount=shops.length-openCount;
+
+ document.getElementById('adminTotal').textContent=shops.length;
+ document.getElementById('adminOpen').textContent=openCount;
+ document.getElementById('adminClosed').textContent=closedCount;
+
+ const list=document.getElementById('adminShopList');
+ list.innerHTML='';
+
+ shops.forEach(shop=>{
+  const open=statuses[shop.name];
+
+  const row=document.createElement('div');
+  row.className='queue';
+
+  const meta=document.createElement('div');
+  meta.className='qmeta';
+
+  const title=document.createElement('strong');
+  title.textContent=shop.name;
+
+  const detail=document.createElement('span');
+  detail.className='muted';
+  detail.textContent='เจ้าของ: '+shop.owner+' · '+shop.plan;
+
+  meta.append(title,detail);
+
+  const actions=document.createElement('div');
+  actions.className='admin-actions';
+
+  const status=document.createElement('span');
+  status.className='tag '+(open?'status-open':'status-closed');
+  status.textContent=open?'เปิดใช้งาน':'ปิดใช้งาน';
+
+  const button=document.createElement('button');
+  button.type='button';
+  button.className='small '+(open?'danger':'success');
+  button.textContent=open?'ปิดร้าน':'เปิดร้าน';
+
+  button.addEventListener('click',()=>{
+   const updated=getShopStatuses();
+   updated[shop.name]=!updated[shop.name];
+   saveShopStatuses(updated);
+   renderAdmin();
+   renderCustomerShops();
+  });
+
+  actions.append(status,button);
+  row.append(meta,actions);
+  list.append(row);
+ });
+}
+
+document.getElementById('bookBtn').addEventListener('click',()=>{
+ const name=document.getElementById('customerName').value.trim();
+ const phone=document.getElementById('customerPhone').value.trim();
+
+ if(!name||!phone){
+  alert('กรุณากรอกชื่อและเบอร์โทรศัพท์ก่อน');
+  return;
+ }
+
+ const shop=document.getElementById('shopSelect').value;
+
+ if(!isShopOpen(shop)){
+  alert('ร้านนี้ปิดให้บริการแล้ว กรุณาเลือกร้านอื่น');
+  renderCustomerShops();
+  return;
+ }
+
+ const arr=getBookings();
+ const today=new Date().toLocaleDateString('th-TH');
+ const count=arr.filter(x=>x.shop===shop&&x.day===today).length+1;
+
+ const item={
+  id:Date.now(),
+  number:'Q'+String(count).padStart(3,'0'),
+  name,
+  phone,
+  shop,
+  service:document.getElementById('service').value,
+  day:today,
+  status:'รอเรียกคิว'
+ };
+
+ arr.push(item);
+ saveBookings(arr);
+
+ document.getElementById('bookingResult').innerHTML=
+  `<div class="successbox"><strong>จองคิวสำเร็จ (ตัวอย่าง)</strong><br>หมายเลขคิว <b style="font-size:25px">${item.number}</b><br>ร้าน: ${shop}<br>บริการ: ${item.service}</div>`;
+
+ document.getElementById('customerName').value='';
+ document.getElementById('customerPhone').value='';
+ renderOwner();
+});
+
+function renderOwner(){
+ const shop=document.getElementById('ownerShop').value;
+ const all=getBookings().filter(x=>x.shop===shop);
+ const done=all.filter(x=>x.status==='เสร็จแล้ว').length;
+ const waiting=all.filter(x=>x.status==='รอเรียกคิว').length;
+
+ document.getElementById('totalCount').textContent=all.length;
+ document.getElementById('waitingCount').textContent=waiting;
+ document.getElementById('doneCount').textContent=done;
+
+ const list=document.getElementById('queueList');
+ list.innerHTML='';
+
+ if(!all.length){
+  list.innerHTML='<p class="muted">ยังไม่มีคิว — ทดลองจองจากหน้าลูกค้า แล้วกลับมาดูที่นี่ได้เลย</p>';
+  return;
+ }
+
+ all.slice().reverse().forEach(x=>{
+  const row=document.createElement('div');
+  row.className='queue';
+
+  const meta=document.createElement('div');
+  meta.className='qmeta';
+
+  const strong=document.createElement('strong');
+  strong.textContent=x.name+' · '+x.service;
+
+  const small=document.createElement('span');
+  small.className='muted';
+  small.textContent=x.phone+' · '+x.day;
+
+  meta.append(strong,small);
+
+  const num=document.createElement('div');
+  num.className='qno';
+  num.textContent=x.number;
+
+  const status=document.createElement('span');
+  status.className='tag '+(x.status==='เสร็จแล้ว'?'done':'');
+  status.textContent=x.status;
+
+  const actions=document.createElement('div');
+
+  if(x.status!=='เสร็จแล้ว'){
+   const btn=document.createElement('button');
+   btn.className='small success';
+   btn.textContent='เสร็จแล้ว';
+
+   btn.onclick=()=>{
+    const a=getBookings();
+    const target=a.find(y=>y.id===x.id);
+    if(target)target.status='เสร็จแล้ว';
+    saveBookings(a);
+    renderOwner();
+   };
+
+   actions.append(btn);
+  }
+
+  row.append(num,meta,status,actions);
+  list.append(row);
+ });
+}
+
 document.getElementById('ownerShop').addEventListener('change',renderOwner);
+
+renderCustomerShops();
+renderAdmin();
 renderOwner();
 </script>
-</body></html>
+</body>
+</html>
