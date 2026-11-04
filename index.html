@@ -295,8 +295,8 @@ function isShopOpen(name){
  return getShopStatuses()[name]!==false;
 }
 
-// สลับสถานะร้าน
-function toggleShop(name){
+// กำหนดสถานะร้านอย่างชัดเจน
+function toggleShop(name,shouldOpen){
  const statuses=getShopStatuses();
 
  if(!(name in statuses)){
@@ -304,8 +304,7 @@ function toggleShop(name){
   return;
  }
 
- const newStatus=!statuses[name];
- statuses[name]=newStatus;
+ statuses[name]=Boolean(shouldOpen);
 
  if(!saveShopStatuses(statuses)){
   return;
@@ -314,9 +313,9 @@ function toggleShop(name){
  renderAdmin();
  renderCustomerShops();
 
- alert(newStatus
-  ?'เปิดใช้งานร้าน '+name+' เรียบร้อยแล้ว'
-  :'ปิดใช้งานร้าน '+name+' เรียบร้อยแล้ว'
+ alert(statuses[name]
+  ?'เปิดร้าน '+name+' เรียบร้อยแล้ว'
+  :'ปิดร้าน '+name+' เรียบร้อยแล้ว'
  );
 }
 
@@ -425,17 +424,15 @@ function renderAdmin(){
 
   const status=document.createElement('span');
   status.className='tag '+(open?'status-open':'status-closed');
-  status.textContent=open?'เปิดใช้งาน':'ปิดใช้งาน';
+  status.textContent=open?'สถานะ: ร้านเปิดอยู่':'สถานะ: ร้านปิดอยู่';
 
   const button=document.createElement('button');
   button.type='button';
   button.className='small admin-toggle '+(open?'danger':'success');
-
-  // ปุ่มแสดงการกระทำถัดไปอย่างชัดเจน
-  button.textContent=open?'ปิดใช้งาน':'เปิดใช้งาน';
+  button.textContent=open?'ปิดร้าน':'เปิดร้าน';
 
   button.addEventListener('click',function(){
-   toggleShop(shop.name);
+   toggleShop(shop.name,!open);
   });
 
   actions.append(status,button);
