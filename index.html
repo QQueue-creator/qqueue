@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QQueue - ระบบจองคิวออนไลน์</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f3f5f9;
+  color:#172033;
+}
+header{
+  background:#1755a4;
+  color:white;
+  padding:25px 15px;
+  text-align:center;
+}
+header h1{margin:0;font-size:30px}
+header p{margin:10px 0 0}
+main{max-width:650px;margin:25px auto;padding:15px}
+.card{
+  background:white;
+  padding:22px;
+  border-radius:14px;
+  margin-bottom:18px;
+  box-shadow:0 3px 15px #00000010;
+}
+label{display:block;margin:14px 0 7px;font-weight:bold}
+input,select{
+  width:100%;
+  padding:13px;
+  border:1px solid #ccd3df;
+  border-radius:8px;
+  font-size:16px;
+}
+button{
+  width:100%;
+  padding:14px;
+  margin-top:15px;
+  border:0;
+  border-radius:9px;
+  background:#2563eb;
+  color:white;
+  font-size:17px;
+  cursor:pointer;
+}
+button:hover{background:#174bb5}
+.stats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.stat{
+  background:#eaf2ff;
+  padding:18px;
+  border-radius:10px;
+  text-align:center;
+}
+.number{font-size:27px;font-weight:bold;color:#1755a4}
+.ticket{
+  display:none;
+  background:#e9fff1;
+  border:1px solid #9cdeb3;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+}
+.ticket h2{color:#087b39}
+footer{text-align:center;color:#777;padding:20px;font-size:13px}
+</style>
+</head>
+<body>
+
+<header>
+<h1>QQueue</h1>
+<p>ระบบจองคิวออนไลน์ สะดวก รวดเร็ว</p>
+</header>
+
+<main>
+
+<div class="card">
+<h2>📋 จองคิวออนไลน์</h2>
+
+<label>ชื่อผู้จอง</label>
+<input id="customer" placeholder="กรอกชื่อของคุณ">
+
+<label>เบอร์โทรศัพท์</label>
+<input id="phone" type="tel" placeholder="กรอกเบอร์โทรศัพท์">
+
+<label>เลือกบริการ</label>
+<select id="service">
+<option value="บริการทั่วไป">บริการทั่วไป</option>
+<option value="ปรึกษา">ปรึกษา</option>
+<option value="ติดต่อเจ้าหน้าที่">ติดต่อเจ้าหน้าที่</option>
+</select>
+
+<button onclick="bookQueue()">ยืนยันการจองคิว</button>
+</div>
+
+<div class="ticket" id="ticket">
+<h2>จองคิวสำเร็จ!</h2>
+<p>หมายเลขคิวของคุณ</p>
+<div class="number" id="ticketNumber"></div>
+<p id="ticketInfo"></p>
+</div>
+
+<div class="card">
+<h2>📊 สถานะคิววันนี้</h2>
+<div class="stats">
+<div class="stat">
+<div class="number" id="total">0</div>
+<p>คิวทั้งหมด</p>
+</div>
+<div class="stat">
+<div class="number" id="waiting">0</div>
+<p>คิวรอรับบริการ</p>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h3>📌 รายการจองคิว</h3>
+<div id="queueList">ยังไม่มีรายการจอง</div>
+</div>
+
+</main>
+
+<footer>
+QQueue Online Queue Booking System
+</footer>
+
+<script>
+let queues = JSON.parse(localStorage.getItem("qqueue") || "[]");
+
+function updateDisplay(){
+  document.getElementById("total").textContent=queues.length;
+  document.getElementById("waiting").textContent=queues.length;
+
+  const list=document.getElementById("queueList");
+
+  if(queues.length===0){
+    list.textContent="ยังไม่มีรายการจอง";
+    return;
+  }
+
+  list.innerHTML=queues.map(q=>
+    `<div style="padding:12px;border-bottom:1px solid #eee">
+    <b>${q.number}</b> - ${escapeHTML(q.name)}
+    <br><small>${escapeHTML(q.service)}</small>
+    </div>`
+  ).join("");
+}
+
+function escapeHTML(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",
+    '"':"&quot;","'":"&#39;"
+  })[c]);
+}
+
+function bookQueue(){
+  const name=document.getElementById("customer").value.trim();
+  const phone=document.getElementById("phone").value.trim();
+  const service=document.getElementById("service").value;
+
+  if(!name||!phone){
+    alert("กรุณากรอกชื่อและเบอร์โทรศัพท์");
+    return;
+  }
+
+  const number="Q"+String(queues.length+1).padStart(3,"0");
+
+  queues.push({
+    number,name,phone,service
+  });
+
+  localStorage.setItem("qqueue",JSON.stringify(queues));
+
+  document.getElementById("ticketNumber").textContent=number;
+  document.getElementById("ticketInfo").textContent=
+    "ชื่อ: "+name+" | บริการ: "+service;
+
+  document.getElementById("ticket").style.display="block";
+
+  document.getElementById("customer").value="";
+  document.getElementById("phone").value="";
+
+  updateDisplay();
+}
+
+updateDisplay();
+</script>
+
+</body>
+</html>
