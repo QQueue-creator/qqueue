@@ -424,18 +424,27 @@ function renderAdmin(){
 
   const status=document.createElement('span');
   status.className='tag '+(open?'status-open':'status-closed');
-  status.textContent=open?'สถานะ: ร้านเปิดอยู่':'สถานะ: ร้านปิดอยู่';
+  status.textContent=open?'สถานะปัจจุบัน: เปิดร้าน':'สถานะปัจจุบัน: ปิดร้าน';
 
-  const button=document.createElement('button');
-  button.type='button';
-  button.className='small admin-toggle '+(open?'danger':'success');
-  button.textContent=open?'ปิดร้าน':'เปิดร้าน';
-
-  button.addEventListener('click',function(){
-   toggleShop(shop.name,!open);
+  const openButton=document.createElement('button');
+  openButton.type='button';
+  openButton.className='small success admin-toggle';
+  openButton.textContent='ตั้งเป็นร้านเปิด';
+  openButton.disabled=open;
+  openButton.addEventListener('click',function(){
+   toggleShop(shop.name,true);
   });
 
-  actions.append(status,button);
+  const closeButton=document.createElement('button');
+  closeButton.type='button';
+  closeButton.className='small danger admin-toggle';
+  closeButton.textContent='ตั้งเป็นร้านปิด';
+  closeButton.disabled=!open;
+  closeButton.addEventListener('click',function(){
+   toggleShop(shop.name,false);
+  });
+
+  actions.append(status,openButton,closeButton);
   row.append(meta,actions);
   list.append(row);
  });
